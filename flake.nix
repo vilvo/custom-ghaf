@@ -51,12 +51,27 @@
       }))
 
       {
-        nixosConfigurations.dogfood-ghaf-debug = ghaf.nixosConfigurations.nvidia-jetson-orin-debug.extendModules {
+        nixosConfigurations.dogfood-ghaf-debug = ghaf.nixosConfigurations.nvidia-jetson-orin-agx-debug.extendModules {
           modules = [
             {
-              #insert your additional modules here e.g.
-              # virtualisation.docker.enable = true;
-              # users.users."ghaf".extraGroups = ["docker"];
+              users.users."vilvo"= {
+                isNormalUser = true;
+                extraGroups = [ "wheel" ];
+                openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDdNDuKwAsAff4iFRfujo77W4cyAbfQHjHP57h/7tJde ville.ilvonen@unikie.com" ];
+              };
+              nix.settings.trusted-users = [ "root" "vilvo" ]; # to test ghaf as remote builder (aarch64) on NVIDIA Orin AGX
+
+              ghaf.graphics.weston = {
+                # use nixpkgs.libmkForce to force the priority of conflicting values from ghaf applications.nix and this file
+                #
+                # error: The option `ghaf.graphics.weston.enable' has conflicting definition values:
+                #       - In `/nix/store/10hjscs2lqhg66v5845jh00sg12nsq76-source/modules/profiles/applications.nix': true
+                #       - In `<unknown-file>': false
+                #       Use `lib.mkForce value` or `lib.mkDefault value` to change the priority on any of these definitions.
+                # (use '--show-trace' to show detailed location information)
+                enable = nixpkgs.lib.mkForce false;
+                enableDemoApplications = nixpkgs.lib.mkForce false;
+              };
             }
           ];
         };
