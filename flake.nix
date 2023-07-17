@@ -54,6 +54,8 @@
         nixosConfigurations.dogfood-ghaf-debug = ghaf.nixosConfigurations.nvidia-jetson-orin-agx-debug.extendModules {
           modules = [
             {
+              boot.growPartition = true;
+
               users.users."vilvo"= {
                 isNormalUser = true;
                 extraGroups = [ "wheel" ];
