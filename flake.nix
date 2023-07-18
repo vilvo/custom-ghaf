@@ -51,7 +51,7 @@
       }))
 
       {
-        nixosConfigurations.dogfood-ghaf-debug = ghaf.nixosConfigurations.nvidia-jetson-orin-agx-debug.extendModules {
+        nixosConfigurations.dogfood-ghaf-debug = ghaf.nixosConfigurations.nvidia-jetson-orin-nx-debug.extendModules {
           modules = [
             {
               boot.growPartition = true;
