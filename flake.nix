@@ -51,7 +51,7 @@
       }))
 
       {
-        nixosConfigurations.dogfood-ghaf-debug = ghaf.nixosConfigurations.nvidia-jetson-orin-nx-debug.extendModules {
+        nixosConfigurations.custom-ghaf-nx-debug = ghaf.nixosConfigurations.nvidia-jetson-orin-nx-debug.extendModules {
           modules = [
             {
               boot.growPartition = true;
@@ -81,13 +81,20 @@
             }
           ];
         };
-        packages.aarch64-linux.dogfood-ghaf-debug = self.nixosConfigurations.dogfood-ghaf-debug.config.system.build.${self.nixosConfigurations.dogfood-ghaf-debug.config.formatAttr};
 
-        packages.x86_64-linux.dogfood-ghaf-debug-flash-script = mkFlashScript {
+        packages.aarch64-linux.custom-ghaf-nx-debug = self.nixosConfigurations.custom-ghaf-nx-debug.config.system.build.${self.nixosConfigurations.custom-ghaf-nx-debug.config.formatAttr};
+
+        packages.x86_64-linux.custom-ghaf-nx-debug-flash-script = mkFlashScript {
           inherit nixpkgs jetpack-nixos;
-          hostConfiguration = self.nixosConfigurations.dogfood-ghaf-debug;
+          hostConfiguration = self.nixosConfigurations.custom-ghaf-nx-debug;
           flash-tools-system = flake-utils.lib.system.x86_64-linux;
         };
-      }
+
+        nixosConfigurations.custom-ghaf-x1-debug = ghaf.nixosConfigurations.lenovo-x1-carbon-gen11-debug.extendModules {
+        modules = [];
+        };
+        packages.x86_64-linux.custom-ghaf-x1-debug = self.nixosConfigurations.custom-ghaf-x1-debug.config.system.build.${self.nixosConfigurations.custom-ghaf-x1-debug.config.formatAttr};
+
+    }
     ];
 }
