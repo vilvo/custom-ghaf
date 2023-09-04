@@ -87,6 +87,15 @@
         nixosConfigurations.custom-ghaf-x1-debug = ghaf.nixosConfigurations.lenovo-x1-carbon-gen11-debug.extendModules {
           modules = [
             ./modules/users/accounts.nix
+            {
+              ghaf = {
+                virtualization.microvm.netvm = {
+                  extraModules = [
+                    ./modules/networking/wifi.nix
+                  ];
+                };
+              };
+            }
           ];
         };
         packages.x86_64-linux.custom-ghaf-x1-debug = self.nixosConfigurations.custom-ghaf-x1-debug.config.system.build.${self.nixosConfigurations.custom-ghaf-x1-debug.config.formatAttr};
