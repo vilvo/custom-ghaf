@@ -53,15 +53,9 @@
       {
         nixosConfigurations.custom-ghaf-nx-debug = ghaf.nixosConfigurations.nvidia-jetson-orin-nx-debug.extendModules {
           modules = [
+            ./modules/users/accounts.nix
             {
               boot.growPartition = true;
-
-              users.users."vilvo"= {
-                isNormalUser = true;
-                extraGroups = [ "wheel" ];
-                openssh.authorizedKeys.keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDdNDuKwAsAff4iFRfujo77W4cyAbfQHjHP57h/7tJde ville.ilvonen@unikie.com" ];
-              };
-              nix.settings.trusted-users = [ "root" "vilvo" ]; # to test ghaf as remote builder (aarch64) on NVIDIA Orin AGX
 
               ghaf = {
                   graphics.weston = {
@@ -91,7 +85,9 @@
         };
 
         nixosConfigurations.custom-ghaf-x1-debug = ghaf.nixosConfigurations.lenovo-x1-carbon-gen11-debug.extendModules {
-        modules = [];
+          modules = [
+            ./modules/users/accounts.nix
+          ];
         };
         packages.x86_64-linux.custom-ghaf-x1-debug = self.nixosConfigurations.custom-ghaf-x1-debug.config.system.build.${self.nixosConfigurations.custom-ghaf-x1-debug.config.formatAttr};
 
