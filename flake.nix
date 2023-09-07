@@ -29,6 +29,12 @@
         jetpack-nixos.follows = "jetpack-nixos";
       };
     };
+    agenix = {
+      url = "github:ryantm/agenix";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+      };
+    };
   };
 
   outputs = {
@@ -37,6 +43,7 @@
     nixpkgs,
     jetpack-nixos,
     flake-utils,
+    agenix,
   }: let
     systems = with flake-utils.lib.system; [
       x86_64-linux
@@ -85,8 +92,10 @@
         };
 
         nixosConfigurations.custom-ghaf-x1-debug = ghaf.nixosConfigurations.lenovo-x1-carbon-gen11-debug.extendModules {
+
           modules = [
             ./modules/users/accounts.nix
+            agenix.nixosModules.default
             {
               ghaf = {
                 virtualization.microvm.netvm = {
@@ -95,11 +104,11 @@
                   ];
                 };
               };
+	      age.secrets.secret1.file = ./secrets/secret1.age;
             }
           ];
         };
         packages.x86_64-linux.custom-ghaf-x1-debug = self.nixosConfigurations.custom-ghaf-x1-debug.config.system.build.${self.nixosConfigurations.custom-ghaf-x1-debug.config.formatAttr};
-
-    }
+      }
     ];
 }
