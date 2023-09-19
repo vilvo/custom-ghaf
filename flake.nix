@@ -65,7 +65,7 @@
               boot.growPartition = true;
 
               ghaf = {
-                  graphics.weston = {
+                graphics.weston = {
                   # use nixpkgs.libmkForce to force the priority of conflicting values from ghaf applications.nix and this file
                   #
                   # error: The option `ghaf.graphics.weston.enable' has conflicting definition values:
@@ -92,10 +92,10 @@
         };
 
         nixosConfigurations.custom-ghaf-x1-debug = ghaf.nixosConfigurations.lenovo-x1-carbon-gen11-debug.extendModules {
-
           modules = [
             ./modules/users/accounts.nix
             agenix.nixosModules.default
+            ./modules/debug/usb.nix
             {
               ghaf = {
                 virtualization.microvm.netvm = {
@@ -104,7 +104,7 @@
                   ];
                 };
               };
-	      age.secrets.secret1.file = ./secrets/secret1.age;
+              age.secrets.secret1.file = ./secrets/secret1.age;
             }
           ];
         };
