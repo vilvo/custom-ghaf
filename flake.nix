@@ -98,12 +98,23 @@
             ./modules/debug/usb.nix
             {
               ghaf = {
+
                 virtualization.microvm.netvm = {
                   extraModules = [
                     ./modules/networking/wifi.nix
                   ];
                 };
+
+                graphics.demo-apps = {
+                  chromium = false;
+                  firefox = true;
+                  gala-app = false;
+                  element-desktop = false;
+                  zathura = true;
+                };
+
               };
+
               age.secrets.secret1.file = ./secrets/secret1.age;
             }
           ];
