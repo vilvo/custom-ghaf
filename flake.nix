@@ -76,7 +76,7 @@
                   enable = nixpkgs.lib.mkForce false;
                   enableDemoApplications = nixpkgs.lib.mkForce false;
                 };
-                profiles.graphics.enable = false;
+                profiles.graphics.enable = nixpkgs.lib.mkForce false;
                 windows-launcher.enable = nixpkgs.lib.mkForce false;
               };
             }
