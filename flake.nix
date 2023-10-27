@@ -22,7 +22,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     ghaf = {
-      url = "github:tiiuae/ghaf";
+      url = "github:vilvo/ghaf/hardening_host_kernel";
       inputs = {
         nixpkgs.follows = "nixpkgs";
         flake-utils.follows = "flake-utils";
@@ -78,6 +78,8 @@
                 };
                 profiles.graphics.enable = nixpkgs.lib.mkForce false;
                 windows-launcher.enable = nixpkgs.lib.mkForce false;
+
+                host.kernel_hardening.enable = false;
               };
             }
           ];

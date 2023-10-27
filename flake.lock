@@ -78,15 +78,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1698315432,
-        "narHash": "sha256-PFD4Ou0Bz7u1JiV83BGcbVKgqO7XFo2iURG/9vpNERc=",
-        "owner": "tiiuae",
+        "lastModified": 1698064920,
+        "narHash": "sha256-/2I2+qAgAItRSoTRvbyhmMPyKkzCw/JR+dD/1V/jfLw=",
+        "owner": "vilvo",
         "repo": "ghaf",
-        "rev": "d29efaa8b62d508ed1637bf37175dd5b437715c6",
+        "rev": "2e984bce87be0f2070aff32025f59a3420a21876",
         "type": "github"
       },
       "original": {
-        "owner": "tiiuae",
+        "owner": "vilvo",
+        "ref": "hardening_host_kernel",
         "repo": "ghaf",
         "type": "github"
       }
@@ -211,11 +212,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1698160471,
-        "narHash": "sha256-lH7ZEItqQOWi21St9JyE6t3yyFNYGoQqSEcS90WMnBY=",
+        "lastModified": 1698288402,
+        "narHash": "sha256-jIIjApPdm+4yt8PglX8pUOexAdEiAax/DXW3S/Mb21E=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "04f431fe64a5ba8ff129cbbbfec489cfe903982c",
+        "rev": "60b9db998f71ea49e1a9c41824d09aa274be1344",
         "type": "github"
       },
       "original": {
