@@ -23,7 +23,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     ghaf = {
-      url = "github:tiiuae/ghaf";
+      url = "github:remimimimimi/ghaf/new-installation-approach";
       inputs = {
         nixpkgs.follows = "nixpkgs";
         flake-utils.follows = "flake-utils";
@@ -78,13 +78,12 @@
               };
 
               # Write public ssh keys that will be used to install the system.
-              # ghaf.installer.sshKeys = [
-              #   "ssh-rsa AAAAB3NzaC1yc2etc/etc/etcjwrsh8e596z6J0l7 example@host"
-              #   "ssh-ed25519 AAAAC3NzaCetcetera/etceteraJZMfk3QPfQ foo@bar"
-              # ];
+              ghaf.installer.sshKeys = [
+                "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDL9fMsclfik2U33/Kbn2CH6QjKpyAW+XOLvEH9drwI6 vilvo@carrie"
+              ];
 
               # Insert block device on which system will be installed (this will destory all content on it).
-              # disko.devices.disk.disk1.device = "/dev/nvme0n1";
+              disko.devices.disk.disk1.device = "/dev/nvme0n1";
             }
           ];
         };
