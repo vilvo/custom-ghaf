@@ -1,9 +1,8 @@
-# Example to create a bios compatible gpt partition
-{lib, ...}: {
+{
   disko.devices = {
     disk.disk1 = {
-      # device = lib.mkDefault "/dev/nvme0n1";
       type = "disk";
+      #device = "/dev/nvme0n1";
       content = {
         type = "gpt";
         partitions = {
@@ -13,7 +12,6 @@
             type = "EF02";
           };
           esp = {
-            name = "ESP";
             size = "500M";
             type = "EF00";
             content = {
@@ -22,23 +20,35 @@
               mountpoint = "/boot";
             };
           };
-          root = {
-            name = "root";
+          luks = {
             size = "100%";
             content = {
-              type = "lvm_pv";
-              vg = "pool";
+              type = "luks";
+              name = "crypted";
+              extraOpenArgs = ["--allow-discards"];
+              # following pre-defined EXAMPLE key,
+              # intentionally shared in version control,
+              # is generated with:
+              # openssl genrsa -out ./example_secret.key
+              # with nixos-anywhere - you must securely
+              # transfer the key to /root before running
+              # nix run github:numtide/nixos-anywhere ...
+              settings.keyFile = "/root/example_secret.key";
+              content = {
+                type = "lvm_pv";
+                vg = "ghaf";
+              };
             };
           };
         };
       };
     };
     lvm_vg = {
-      pool = {
+      ghaf = {
         type = "lvm_vg";
         lvs = {
-          root = {
-            size = "100%FREE";
+          rootA = {
+            size = "30G";
             content = {
               type = "filesystem";
               format = "ext4";
@@ -46,6 +56,13 @@
               mountOptions = [
                 "defaults"
               ];
+            };
+          };
+          rootB = {
+            size = "30G";
+            content = {
+              type = "filesystem";
+              format = "ext4";
             };
           };
         };
