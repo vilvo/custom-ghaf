@@ -23,6 +23,7 @@
     };
     ghaf = {
       url = "github:tiiuae/ghaf";
+      #url = "git+file:///home/vilvo/ghaf";
       inputs = {
         nixpkgs.follows = "nixpkgs";
         flake-utils.follows = "flake-utils";
@@ -120,6 +121,28 @@
           ];
         };
         packages.x86_64-linux.custom-ghaf-x1-debug = self.nixosConfigurations.custom-ghaf-x1-debug.config.system.build.${self.nixosConfigurations.custom-ghaf-x1-debug.config.formatAttr};
+
+       nixosConfigurations.custom-ghaf-x1-hostonly-debug = ghaf.nixosConfigurations.lenovo-x1-carbon-gen11-debug.extendModules {
+          modules = [
+            ./modules/users/accounts.nix
+            ./modules/debug/usb.nix
+            {
+              ghaf = {
+                graphics = {
+                  weston = {
+                    enable = false;
+                    launchers = [ ];
+                  };
+                };
+                virtualization.microvm.appvm.enable = nixpkgs.lib.mkForce false;
+                host.kernel_hardening.enable = nixpkgs.lib.mkForce true;
+              };
+            }
+          ];
+        };
+        packages.x86_64-linux.custom-ghaf-x1-hostonly-debug = self.nixosConfigurations.custom-ghaf-x1-hostonly-debug.config.system.build.${self.nixosConfigurations.custom-ghaf-x1-hostonly-debug.config.formatAttr};
+
+
       }
     ];
 }
