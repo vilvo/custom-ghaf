@@ -1,56 +1,64 @@
-# Copyright 2022-2023 TII (SSRC) and the Ghaf contributors
+# Copyright 2022-2024 TII (SSRC) and the Ghaf contributors
 # SPDX-License-Identifier: Apache-2.0
 {
-  description = "dogfood - a Ghaf based example configuration";
+  description = "custom-x1-hostonly - Ghaf based configuration";
 
   nixConfig = {
+    substituters = [
+      "https://cache.vedenemo.dev"
+      "https://cache.ssrcdevops.tii.ae"
+      "https://ghaf-dev.cachix.org"
+      "https://cache.nixos.org/"
+    ];
     extra-trusted-substituters = [
       "https://cache.vedenemo.dev"
       "https://cache.ssrcdevops.tii.ae"
+      "https://ghaf-dev.cachix.org"
+      "https://cache.nixos.org/"
     ];
     extra-trusted-public-keys = [
-      "cache.vedenemo.dev:RGHheQnb6rXGK5v9gexJZ8iWTPX6OcSeS56YeXYzOcg="
+      "cache.vedenemo.dev:8NhplARANhClUSWJyLVk4WMyy1Wb4rhmWW2u8AejH9E="
       "cache.ssrcdevops.tii.ae:oOrzj9iCppf+me5/3sN/BxEkp5SaFkHfKTPPZ97xXQk="
+      "ghaf-dev.cachix.org-1:S3M8x3no8LFQPBfHw1jl6nmP8A7cVWKntoMKN3IsEQY="
+      "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
     ];
   };
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-23.05";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-23.11";
     flake-utils.url = "github:numtide/flake-utils";
-    jetpack-nixos = {
-      url = "github:anduril/jetpack-nixos";
+    nixos-hardware.url = "github:nixos/nixos-hardware";
+    nixos-generators = {
+      url = "github:nix-community/nixos-generators";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     ghaf = {
       url = "github:tiiuae/ghaf";
-      #url = "git+file:///home/vilvo/ghaf";
       inputs = {
         nixpkgs.follows = "nixpkgs";
         flake-utils.follows = "flake-utils";
-        jetpack-nixos.follows = "jetpack-nixos";
+        nixos-hardware.follows = "nixos-hardware";
       };
     };
-    agenix = {
-      url = "github:ryantm/agenix";
-      inputs = {
-        nixpkgs.follows = "nixpkgs";
-      };
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
   outputs = {
     self,
     ghaf,
+    disko,
     nixpkgs,
-    jetpack-nixos,
+    # deadnix: skip
+    nixos-hardware,
+    nixos-generators,
     flake-utils,
-    agenix,
   }: let
     systems = with flake-utils.lib.system; [
       x86_64-linux
-      aarch64-linux
     ];
-    mkFlashScript = import (ghaf + "/lib/mk-flash-script");
   in
     # Combine list of attribute sets together
     nixpkgs.lib.foldr nixpkgs.lib.recursiveUpdate {} [
@@ -59,90 +67,32 @@
       }))
 
       {
-        nixosConfigurations.custom-ghaf-nx-debug = ghaf.nixosConfigurations.nvidia-jetson-orin-nx-debug.extendModules {
+        nixosConfigurations.custom-x1-hostonly-ghaf-debug = ghaf.nixosConfigurations.generic-x86_64-debug.extendModules {
           modules = [
-            ./modules/users/accounts.nix
-            {
-              boot.growPartition = true;
-
-              ghaf = {
-                graphics.weston = {
-                  # use nixpkgs.libmkForce to force the priority of conflicting values from ghaf applications.nix and this file
-                  #
-                  # error: The option `ghaf.graphics.weston.enable' has conflicting definition values:
-                  #       - In `/nix/store/10hjscs2lqhg66v5845jh00sg12nsq76-source/modules/profiles/applications.nix': true
-                  #       - In `<unknown-file>': false
-                  #       Use `lib.mkForce value` or `lib.mkDefault value` to change the priority on any of these definitions.
-                  # (use '--show-trace' to show detailed location information)
-                  enable = nixpkgs.lib.mkForce false;
-                  enableDemoApplications = nixpkgs.lib.mkForce false;
-                };
-                profiles.graphics.enable = nixpkgs.lib.mkForce false;
-                windows-launcher.enable = nixpkgs.lib.mkForce false;
-              };
-            }
-          ];
-        };
-
-        packages.aarch64-linux.custom-ghaf-nx-debug = self.nixosConfigurations.custom-ghaf-nx-debug.config.system.build.${self.nixosConfigurations.custom-ghaf-nx-debug.config.formatAttr};
-
-        packages.x86_64-linux.custom-ghaf-nx-debug-flash-script = mkFlashScript {
-          inherit nixpkgs jetpack-nixos;
-          hostConfiguration = self.nixosConfigurations.custom-ghaf-nx-debug;
-          flash-tools-system = flake-utils.lib.system.x86_64-linux;
-        };
-
-        nixosConfigurations.custom-ghaf-x1-debug = ghaf.nixosConfigurations.lenovo-x1-carbon-gen11-debug.extendModules {
-          modules = [
-            ./modules/users/accounts.nix
-            agenix.nixosModules.default
-            ./modules/debug/usb.nix
-            {
-              ghaf = {
-
-                virtualization.microvm.netvm = {
-                  extraModules = [
-                    ./modules/networking/wifi.nix
-                  ];
-                };
-
-                graphics.demo-apps = {
-                  chromium = false;
-                  firefox = true;
-                  gala-app = false;
-                  element-desktop = false;
-                  zathura = true;
-                };
-
-              };
-
-              age.secrets.secret1.file = ./secrets/secret1.age;
-            }
-          ];
-        };
-        packages.x86_64-linux.custom-ghaf-x1-debug = self.nixosConfigurations.custom-ghaf-x1-debug.config.system.build.${self.nixosConfigurations.custom-ghaf-x1-debug.config.formatAttr};
-
-       nixosConfigurations.custom-ghaf-x1-hostonly-debug = ghaf.nixosConfigurations.lenovo-x1-carbon-gen11-debug.extendModules {
-          modules = [
-            ./modules/users/accounts.nix
-            ./modules/debug/usb.nix
-            {
+            disko.nixosModules.disko
+            ./disk-config.nix
+            # deadnix: skip
+            ({lib, ...}: {
               ghaf = {
                 graphics = {
                   weston = {
-                    enable = false;
-                    launchers = [ ];
+                    enable = nixpkgs.lib.mkForce false;
+                  };
+                  labwc = {
+                    enable = nixpkgs.lib.mkForce false;
                   };
                 };
-                virtualization.microvm.appvm.enable = nixpkgs.lib.mkForce false;
-                host.kernel_hardening.enable = nixpkgs.lib.mkForce true;
               };
-            }
+              # disko.devices.disk.disk1.device = lib.mkDefault "DRIVE_PATH";
+            })
           ];
         };
-        packages.x86_64-linux.custom-ghaf-x1-hostonly-debug = self.nixosConfigurations.custom-ghaf-x1-hostonly-debug.config.system.build.${self.nixosConfigurations.custom-ghaf-x1-hostonly-debug.config.formatAttr};
-
-
+        packages.x86_64-linux.custom-x1-hostonly-ghaf-debug = let
+          hostConfiguration = self.nixosConfigurations.custom-x1-hostonly-ghaf-debug;
+          formatModule = nixos-generators.nixosModules.raw-efi;
+          inherit ((hostConfiguration.extendModules {modules = [formatModule];})) config;
+        in
+          config.system.build.${config.formatAttr};
       }
     ];
 }
